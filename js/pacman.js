@@ -196,6 +196,7 @@ var GF = function(){
 		this.speed = 3;
 		this.angle1 = 0.25;
 		this.angle2 = 1.75;
+		this.direction = 'r';
 	};
 	
 	// >=test3
@@ -204,6 +205,23 @@ var GF = function(){
 		// test3 / test4 / test7
 		// Tu código aquí
 		
+		pacman.draw(pacman.posX, pacman.posY);
+
+		if (pacman.direction == 'r') {
+			if (pacman.posX < w - pacman.radius) {
+				pacman.posX += pacman.speed;
+			} else {
+				pacman.direction = 'l';
+				pacman.posX -= pacman.speed;
+			}
+		} else if (pacman.direction == 'l') {
+			if (pacman.posX > 0) {
+				pacman.posX -= pacman.speed;
+			} else {
+				pacman.direction = 'r';
+				pacman.posX += pacman.speed;
+			}
+		}
 		
 		// >=test8: introduce esta instrucción 
 		// dentro del código implementado en el test7:
