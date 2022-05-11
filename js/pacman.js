@@ -196,7 +196,7 @@ var GF = function(){
 		this.speed = 3;
 		this.angle1 = 0.25;
 		this.angle2 = 1.75;
-		this.direction = 'r';
+		this.direction = '';
 	};
 	
 	// >=test3
@@ -204,24 +204,28 @@ var GF = function(){
 	
 		// test3 / test4 / test7
 		// Tu código aquí
-		
-		pacman.draw(pacman.posX, pacman.posY);
 
-		if (pacman.direction == 'r') {
-			if (pacman.posX < w - pacman.radius) {
-				pacman.posX += pacman.speed;
-			} else {
-				pacman.direction = 'l';
-				pacman.posX -= pacman.speed;
+		player.draw(player.x, player.y);
+
+		if (player.direction == 'r') {
+			if (player.x < w - 2*player.radius) {
+				player.x += player.speed;
 			}
-		} else if (pacman.direction == 'l') {
-			if (pacman.posX > 0) {
-				pacman.posX -= pacman.speed;
-			} else {
-				pacman.direction = 'r';
-				pacman.posX += pacman.speed;
+
+		} else if (player.direction == 'l') {
+			if (player.x > 0) {
+				player.x -= player.speed;
+			}
+		} else if (player.direction == 'u') {
+			if (player.y > 0) {
+				player.y -= player.speed;
+			}
+		} else if (player.direction == 'd') {
+			if (player.y < h - 2*player.radius) {
+				player.y += player.speed;
 			}
 		}
+
 		
 		// >=test8: introduce esta instrucción 
 		// dentro del código implementado en el test7:
@@ -346,7 +350,17 @@ var GF = function(){
 		
 		// test4
 		// Tu código aquí (reestructúralo para el test7)
-		
+		if (inputStates.right == true) {
+			player.direction = 'r';
+		} else if (inputStates.left == true) {
+			player.direction = 'l';
+		} else if (inputStates.up == true) {
+			player.direction = 'u';
+		} else if (inputStates.down == true) {
+			player.direction = 'd';
+		} else {
+			player.direction = '';
+		}
 		// test7
 		// Tu código aquí
 		// LEE bien el enunciado, especialmente la nota de ATENCION que
@@ -371,10 +385,10 @@ var GF = function(){
 		// Tu codigo aquí (solo tu código y la instrucción requestAnimationFrame(mainLoop);)
 		
 		var x = Math.floor(Math.random() * (w-5))+5;
-    		var y = Math.floor(Math.random() * (h-5))+5;
+		var y = Math.floor(Math.random() * (h-5))+5;
     		
 		ctx.beginPath();
-    		ctx.arc(x,y,5,0,2*Math.PI, false);
+    	ctx.arc(x,y,5,0,2*Math.PI, false);
 		ctx.fillStyle = 'green';
 		ctx.fill();
 		requestAnimatioFrame(mainloop);
@@ -441,6 +455,35 @@ var GF = function(){
 		// add the listener to the main, window object, and update the states
 		// test4
 		// Tu código aquí
+		document.addEventListener('keydown', (event) => {
+			var name = event.key;
+			var code = event.code;
+			if (code == 39){//Right
+				inputStates.right = true;
+			}else if(code == 37){//left
+				inputStates.left = true;
+			}else if(code == 38){//Up
+				inputStates.up = true;
+			}else if(code == 40){//Down
+				inputStates.down = true;
+			}
+
+		}, false);
+
+		document.addEventListener('keyup', (event) => {
+			var name = event.key;
+			var code = event.code;
+			if (code == 39){//Right
+				inputStates.right = false;
+			}else if(code == 37){//left
+				inputStates.left = false;
+			}else if(code == 38){//Up
+				inputStates.up = false;
+			}else if(code == 40){//Down
+				inputStates.down = true;
+			}
+
+		}, false);
 	};
 	
 	
@@ -495,10 +538,10 @@ var GF = function(){
 		ghosts: ghosts, 
 		
 		// solo para el test12
-		thisLevel: thisLevel
+		thisLevel: thisLevel,
 		
 		// solo para el test 13
-		Ghost: Ghost
+		Ghost: Ghost,
 		
 		// solo para el test14
 		thisGame: thisGame
