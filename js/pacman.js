@@ -215,6 +215,8 @@ var GF = function(){
 		this.isWall = function(row, col) {
 			// test7
 			// Tu código aquí
+			var act = this.getMapTile(row,col);
+			return (100<= act && act<=199);
 		};
 
 		// >=test7
@@ -223,6 +225,14 @@ var GF = function(){
 			// Tu código aquí
 			// Determinar si el jugador va a moverse a una fila,columna que tiene pared 
 			// Hacer uso de isWall
+			if((possiblePlayerX % (thisGame.TILE_WIDTH/2) == 0 || possiblePlayerY % (thisGame.TILE_HEIGHT/2) == 0)){
+				var fila = Math.trunc(possiblePlayerY/thisGame.TILE_HEIGHT);
+				var colum = Math.trunc(possiblePlayerX/thisGame.TILE_WIDTH);
+				return this.isWall(fila,colum);
+
+			}else{
+				return true;
+			}
 		};
 		
 		// >=test11
@@ -274,28 +284,122 @@ var GF = function(){
 		// test3 / test4 / test7
 		// Tu código aquí
 
-		player.draw(player.x, player.y);
+		// player.draw(player.x, player.y);
+		//
+		// if (player.direction == 'r') {
+		// 	if (player.x < w - 2*player.radius) {
+		// 		player.x += player.speed;
+		// 	}
+		//
+		// } else if (player.direction == 'l') {
+		// 	if (player.x > 0) {
+		// 		player.x -= player.speed;
+		// 	}
+		// } else if (player.direction == 'u') {
+		// 	if (player.y > 0) {
+		// 		player.y -= player.speed;
+		// 	}
+		// } else if (player.direction == 'd') {
+		// 	if (player.y < h - 2*player.radius) {
+		// 		player.y += player.speed;
+		// 	}
+		// }
+		if(this.velX<0){
+			this.sprite=this.sprites[1];
+		} else if(this.velX>0){
+			this.sprite=this.sprites[0];
+		} else if(this.velY<0){
+			this.sprite=this.sprites[2];
+		} else if(this.velY>0){
+			this.sprite=this.sprites[3];
+		}
+		this.sprite.update(delta);
+		if(this.radius <= this.x && this.x <= w-this.radius){
 
-		if (player.direction == 'r') {
-			if (player.x < w - 2*player.radius) {
-				player.x += player.speed;
+			var i =0;
+			var salir=false;
+			var comido=false;
+			while (i< numGhosts && !salir){
+				if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)){
+					salir=true;
+				}else{
+					i++;
+				}
 			}
 
-		} else if (player.direction == 'l') {
-			if (player.x > 0) {
-				player.x -= player.speed;
+			//Si se han chocado y era vulnerable
+			if(salir && ghosts[i].state==2){
+				salir=false;
+				eatghost.play();
+				ghosts[i].state=3;
+				var velocidadX=ghosts[i].homeX-ghosts[i].x;
+				var velocidadY=ghosts[i].homeY-ghosts[i].y;
+				ghosts[i].velX=velocidadX*ghosts[i].speed/Math.abs(Math.max(velocidadX, velocidadY));
+				ghosts[i].velY=velocidadY*ghosts[i].speed/Math.abs(Math.max(velocidadX, velocidadY));
+				thisGame.addToScore(puntosFantasma);
+			} else if(salir && ghosts[i].state==1){
+				//Si se han chocado y estaba en estado normal
+				comido=true;
+
 			}
-		} else if (player.direction == 'u') {
-			if (player.y > 0) {
-				player.y -= player.speed;
+
+			if(!salir){
+				this.x = this.x + this.velX;
 			}
-		} else if (player.direction == 'd') {
-			if (player.y < h - 2*player.radius) {
-				player.y += player.speed;
+
+		} else if(this.radius > this.x){
+			this.x = this.radius;
+		} else if(this.x > w-this.radius){
+			this.x = w-this.radius;
+		}
+
+		if(this.radius <= this.y && this.y <= h-this.radius){
+			var i =0;
+			var salir=false;
+			while (i< numGhosts && !salir){
+				if(thisLevel.checkIfHit(this.x,this.y,ghosts[i].x,ghosts[i].y,TILE_WIDTH/2)){
+					salir=true;
+				}else{
+					i++;
+				}
+			}
+
+			//Si se han chocado y era vulnerable
+			if(salir && ghosts[i].state==2){
+				salir=false;
+				eatghost.play();
+				ghosts[i].state=3;
+				var velocidadX=ghosts[i].homeX-ghosts[i].x;
+				var velocidadY=ghosts[i].homeY-ghosts[i].y;
+				ghosts[i].velX=velocidadX*ghosts[i].speed/Math.abs(Math.max(velocidadX, velocidadY));
+				ghosts[i].velY=velocidadY*ghosts[i].speed/Math.abs(Math.max(velocidadX, velocidadY));
+				thisGame.addToScore(puntosFantasma);
+			} else if(salir && ghosts[i].state==1){
+				//Si se han chocado y estaba en estado normal
+				comido=true;
+			}
+
+			if(!salir){
+				this.y = this.y + this.velY;
+			}
+		} else if(this.radius > this.y){
+			this.y = this.radius;
+		} else if(this.y > h-this.radius){
+			this.y = h-this.radius;
+		}
+
+		if(comido){
+			thisGame.lifes--;
+			die.play();
+			if(thisGame.lifes>0){
+				thisGame.setMode(thisGame.HIT_GHOST);
+			} else{
+
+				thisGame.lifes=0;
+				thisGame.setMode(thisGame.GAME_OVER);
 			}
 		}
 
-		
 		// >=test8: introduce esta instrucción 
 		// dentro del código implementado en el test7:
 		// tras actualizar this.x  y  this.y... 
@@ -434,8 +538,95 @@ var GF = function(){
 		// Tu código aquí
 		// LEE bien el enunciado, especialmente la nota de ATENCION que
 		// se muestra tras el test 7
-	};
+		var fila = Math.trunc(player.y/thisGame.TILE_HEIGHT);
+		var	colum = Math.trunc(player.x/thisGame.TILE_WIDTH);
+		if((player.x % (thisGame.TILE_WIDTH/2) == 0 && player.y % (thisGame.TILE_HEIGHT/2) == 0) && (player.x % (thisGame.TILE_WIDTH) != 0 && player.y % (thisGame.TILE_HEIGHT) != 0) && !inputStates.space && thisGame.mode!=thisGame.PAUSE){
+			if(inputStates.left){
+				if(!thisLevel.checkIfHitWall(player.x-(thisGame.TILE_WIDTH/2)-1,player.y,fila,colum)){
+					oldDir="left";
+					player.velX = -player.speed;
+					player.velY = 0;
+				} else{
+					resetearVelocidades();
+					inputStates.left=false;
+					recuperarDir(oldDir);
+				}
 
+			} else if (inputStates.right){
+				if(!thisLevel.checkIfHitWall(player.x+(thisGame.TILE_WIDTH/2),player.y,fila,colum)){
+					oldDir="right";
+					player.velX = player.speed;
+					player.velY = 0;
+				} else{
+					resetearVelocidades();
+					inputStates.right=false;
+					recuperarDir(oldDir);
+				}
+
+			} else if (inputStates.up){
+				if(!thisLevel.checkIfHitWall(player.x,player.y-(thisGame.TILE_HEIGHT/2)-1,fila,colum)){
+					oldDir="up";
+					player.velY = -player.speed;
+					player.velX = 0;
+				} else{
+					resetearVelocidades();
+					inputStates.up=false;
+					recuperarDir(oldDir);
+				}
+
+			} else if (inputStates.down){
+				if(!thisLevel.checkIfHitWall(player.x,player.y+(thisGame.TILE_HEIGHT/2),fila,colum)){
+					oldDir="down";
+					player.velY = player.speed;
+					player.velX = 0;
+				} else{
+					resetearVelocidades();
+					inputStates.down=false;
+					recuperarDir(oldDir);
+				}
+
+			} else if (!inputStates.space && thisGame.mode!=thisGame.PAUSE){
+				if(!thisLevel.checkIfHitWall(player.x+(thisGame.TILE_WIDTH/2),player.y,fila,colum)){
+					oldDir="right";
+					player.velX = player.speed;
+					player.velY = 0;
+				} else{
+					resetearVelocidades();
+				}
+			}
+		} else if (inputStates.space || thisGame.mode==thisGame.PAUSE){
+			if(thisGame.mode!=thisGame.PAUSE){
+				oldMode=thisGame.mode;
+				thisGame.setMode(thisGame.PAUSE);
+				inputStates.space=false;
+			} else if(inputStates.space){
+				thisGame.setMode(oldMode);
+				inputStates.space=false;
+				recuperarDir(oldDir);
+			}
+
+
+		}
+	};
+	var recuperarDir = function(oldDir){
+		if(oldDir=="left"){
+			inputStates.left=true;
+		}else if(oldDir=="right"){
+			inputStates.right=true;
+		}else if(oldDir=="up"){
+			inputStates.up=true;
+		}else if(oldDir=="down"){
+			inputStates.down=true;
+		}
+	}
+
+	var oldDir;
+	var oldMode;
+
+	var resetearVelocidades = function(){
+		player.velX = 0;
+		player.velY = 0;
+	}
 	// >=test12
 	var updateTimers = function(){
 		// test12
@@ -527,14 +718,16 @@ var GF = function(){
 		document.addEventListener('keydown', (event) => {
 			var name = event.key;
 			var code = event.code;
-			if (code == 39){//Right
+			if (code == 39) { //Right
 				inputStates.right = true;
-			}else if(code == 37){//left
+			} else if (code == 37) { //left
 				inputStates.left = true;
-			}else if(code == 38){//Up
+			} else if (code == 38) { //Up
 				inputStates.up = true;
-			}else if(code == 40){//Down
+			} else if (code == 40) { //Down
 				inputStates.down = true;
+			} else if (code == 32) { //Space
+				inputStates.space = true;
 			}
 
 		}, false);
@@ -542,14 +735,16 @@ var GF = function(){
 		document.addEventListener('keyup', (event) => {
 			var name = event.key;
 			var code = event.code;
-			if (code == 39){//Right
+			if (code == 39) { //Right
 				inputStates.right = false;
-			}else if(code == 37){//left
+			} else if (code == 37) { //left
 				inputStates.left = false;
-			}else if(code == 38){//Up
+			} else if (code == 38) { //Up
 				inputStates.up = false;
-			}else if(code == 40){//Down
-				inputStates.down = true;
+			} else if (code == 40) { //Down
+				inputStates.down = false;
+			} else if (code == 32) { //Space
+				inputStates.space = false;
 			}
 
 		}, false);
@@ -568,7 +763,11 @@ var GF = function(){
 		// Tu código aquí
 		// Inicialmente Pacman debe empezar a moverse en horizontal hacia la derecha, con una velocidad igual a su atributo speed
 		// inicializa la posición inicial de Pacman tal y como indica el enunciado
-	
+		inputStates.left=false;
+		inputStates.right=true;
+		inputStates.up=false;
+		inputStates.down=false;
+		inputStates.space=false;
 		// test10
 		// Tu código aquí
 		// Inicializa los atributos x,y, velX, velY, speed de la clase Ghost de forma conveniente
