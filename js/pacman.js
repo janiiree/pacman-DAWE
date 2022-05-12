@@ -176,6 +176,39 @@ var GF = function(){
 		
 			// test6
 			// Tu código aquí
+			for (var fila = 0; fila <= thisGame.screenTileSize[0]; fila++) {
+				for (var colum = 0; colum < thisGame.screenTileSize[1]; colum++) {
+					var elem = this.getMapTile(fila, colum);
+					if (elem == 4) {
+						//Pacman
+					} else if (elem == 0) {
+						//Baldosa vacia
+					} else if (elem == 2) {
+						//Pildora
+						ctx.beginPath();
+						ctx.arc(colum * TILE_WIDTH + (TILE_WIDTH / 2), fila * TILE_HEIGHT + (TILE_HEIGHT / 2), 4, 0, 2 * Math.PI, false);
+						ctx.fillStyle = "#FFFFFF";
+						ctx.fill();
+					} else if (elem == 3) {
+						//Pildora de poder
+						if (this.powerPelletBlinkTimer < 30) {
+							ctx.beginPath();
+							ctx.arc(colum * TILE_WIDTH + (TILE_WIDTH / 2), fila * TILE_HEIGHT + (TILE_HEIGHT / 2), 4, 0, 2 * Math.PI, false);
+							ctx.fillStyle = "#FF0000";
+							ctx.fill();
+						}
+					} else if (elem >= 100 && elem < 200) {
+						//Pared
+						ctx.fillStyle = '#0000FF';
+						ctx.fillRect(colum * TILE_WIDTH, fila * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+					}
+					else if (elem >= 10 && elem < 14) {
+						//Fantasmas
+						ctx.fillStyle = '#000000';
+						ctx.fillRect(colum * TILE_WIDTH, fila * TILE_HEIGHT, TILE_WIDTH, TILE_HEIGHT);
+					}
+				}
+			}
 		};
 
 		// >=test7
