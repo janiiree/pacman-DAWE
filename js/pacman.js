@@ -104,16 +104,22 @@ var GF = function(){
 		this.setMapTile = function(row, col, newValue){
 			// test5
 			// Tu código aquí
+			if(newValue == 2 || newValue == 3){
+				this.pellets++;
+			}
+			this.map[(row*this.lvlWidth)+col] = newValue;
 		};
 
 		this.getMapTile = function(row, col){
 			// test5
-			// Tu código aquí	
+			// Tu código aquí
+			return this.map[(row*this.lvlWidth)+col];
 		};
 
 		this.printMap = function(){
 			// test5
 			// Tu código aquí
+			console.log(this.map);
 		};
 
 		this.loadLevel = function(){
@@ -121,7 +127,37 @@ var GF = function(){
 			// Tu código aquí
 			// leer res/levels/1.txt y guardarlo en el atributo map	
 			// haciendo uso de setMapTile
-		
+
+			$.ajaxSetup({async:false});
+
+			$.get("../res/levels/1.txt", (data) => {
+			//$.get("https://raw.githubusercontent.com/AinhoY/froga/main/1.txt", (data) => {
+				var trozos = data.split("#");
+
+				//cojo el ancho
+				var valores = trozos[1].split(" ");
+				this.lvlWidth = valores[2];
+
+				//cojo la altura
+				valores = trozos[2].split(" ");
+				this.lvlHeight = valores[2];
+
+				//cojo los valores
+				valores = trozos[3].split("\n");
+				var filas = valores.slice(1,valores.length-1);
+
+				$.each(filas, (n, elem1) => {
+					var nums = elem1.split(" ");
+					$.each(nums, (m, elem2) => {
+						this.setMapTile(n,m,elem2);
+					});
+
+				});
+			});
+			this.printMap();
+
+
+
 			// test10
 			// Tu código aquí
 		};
