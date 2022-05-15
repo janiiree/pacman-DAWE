@@ -246,6 +246,13 @@ var GF = function() {
 					}
 				}
 			});
+			var pts = localStorage.getItem("maxptspacman");
+			if(pts!=null){
+				thisGame.highscore=pts;
+			} else {
+				localStorage.setItem("maxptspacman", 0);
+				thisGame.highscore=0;
+			}
 		};
 		this.displayGameOver = function () {
 			ctx.beginPath();
@@ -254,6 +261,18 @@ var GF = function() {
 			ctx.textAlign = "center";
 			ctx.fillText("GAME OVER", w / 2 - 50, h / 2);
 			ctx.closePath();
+		};
+		this.displayVictoria = function () {
+			ctx.beginPath();
+			ctx.font = "60px Arial";
+			ctx.fillStyle = "green";
+			ctx.textAlign = "center";
+			ctx.fillText("VICTORIA", w / 2 - 50, h / 2);
+			ctx.closePath();
+
+			if(thisGame.points > thisGame.highscore){
+				localStorage.setItem("maxptspacman", thisGame.points);
+			}
 		};
 
 		this.displayScore = function () {
@@ -272,7 +291,7 @@ var GF = function() {
 			ctx.closePath();
 			ctx.beginPath();
 			ctx.fillStyle = "#fff";
-			ctx.fillText("0", TILE_WIDTH * 19, TILE_HEIGHT - 5);
+			ctx.fillText(thisGame.highscore, TILE_WIDTH * 19, TILE_HEIGHT - 5);
 			ctx.closePath();
 			ctx.beginPath();
 			ctx.fillStyle = "#fff";
@@ -405,7 +424,7 @@ var GF = function() {
 								thisLevel.setMapTile(r, c, 0);
 								thisLevel.pellets--;
 								thisGame.addToScore(tileID.pellet);
-								if(thisLevel.pellets == 0) console.log("Next level!");
+								if(thisLevel.pellets == 0) this.displayVictoria();
 							}
 							else if (pos == 3) {
 								eatPill.stop();
